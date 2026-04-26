@@ -12,17 +12,17 @@ Swing (GUI)
 
 Screenshots
 Login Page
-![Login](Output/Login.png)
+![Login](Login.png)
 Dashboard
-![Dashboard](Output/Dashboard.png)
+![Dashboard](Dashboard.png)
 View Books
-![View Books](Output/view.png)
+![View Books](view.png)
 Issue Books
-![Issue Books](Output/Issuebook.png)
+![Issue Books](Issuebook.png)
 Return Books
-![Return book](Output/Returnbook.png)
+![Return book](Returnbook.png)
 Search
-![Search](Output/Search.png)
+![Search](Search.png)
 Search Result
-![Search result](Output/SearchResult.png)
+![Search result](SearchResult.png)
 
