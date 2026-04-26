@@ -5,17 +5,21 @@ import java.util.Date;
 
 public class LibraryService {
     public String addBook(String title, String author) {
-        try (Connection con = DatabaseConnector.getConnection()) {
-            String query = "INSERT INTO books (title, author, available) VALUES (?, ?, true)";
-            PreparedStatement ps = con.prepareStatement(query);
-            ps.setString(1, title);
-            ps.setString(2, author);
-            ps.executeUpdate();
-            return "Book added successfully!";
-        } catch (Exception e) {
-            return e.getMessage();
-        }
+        if (title == null || title.trim().isEmpty() ||
+        author == null || author.trim().isEmpty()) {
+        return "Invalid input!";
     }
+        try (Connection con = DatabaseConnector.getConnection()) {
+        String query = "INSERT INTO books (title, author, available) VALUES (?, ?, true)";
+        PreparedStatement ps = con.prepareStatement(query);
+        ps.setString(1, title);
+        ps.setString(2, author);
+        ps.executeUpdate();
+        return "Book added successfully!";
+    } catch (Exception e) {
+        return e.getMessage();
+    }
+}
     public String removeBook(int id) {
         try (Connection con = DatabaseConnector.getConnection()) {
             String query = "DELETE FROM books WHERE id=?";
@@ -29,7 +33,7 @@ public class LibraryService {
     }
     public String updateBook(int id, String title, String author) {
         try (Connection con = DatabaseConnector.getConnection()) {
-            String query = "UPDATE books SET title=?, author=? WHERE id=?";
+            String query = "UPDATE  books SET title=?, author=? WHERE id=?";
             PreparedStatement ps = con.prepareStatement(query);
             ps.setString(1, title);
             ps.setString(2, author);
@@ -42,7 +46,7 @@ public class LibraryService {
     }
     public String issueBook(int id) {
         try (Connection con = DatabaseConnector.getConnection()) {
-            String check = "SELECT available FROM books WHERE id=?";
+            String   check = "SELECT available FROM books WHERE id=?";
             PreparedStatement ps1 = con.prepareStatement(check);
             ps1.setInt(1, id);
             ResultSet rs = ps1.executeQuery();
@@ -51,7 +55,7 @@ public class LibraryService {
                 PreparedStatement ps = con.prepareStatement(query);
                 ps.setInt(1, id);
                 ps.executeUpdate();
-                return "Book issued! Due in 7 days.";
+                return "Book issued and Due in 7 days.";
             } else {
                 return "Book not available!";
             }
@@ -72,7 +76,7 @@ public class LibraryService {
                 long daysLate = diff / (1000 * 60 * 60 * 24);
                 int fine = 0;
                 if (daysLate > 0) {
-                    fine = (int) daysLate * 5;
+                    fine = (int) daysLate * 50;
                     return "Late by " + daysLate + " days. Fine: ₹" + fine;
                 } else {
                     return "Returned on time. No fine.";
@@ -94,12 +98,11 @@ public class LibraryService {
             ResultSet rs = st.executeQuery(query);
 
             while (rs.next()) {
-                sb.append("ID: ").append(rs.getInt("id")).append("\n");
+                sb.append("\nID: ").append(rs.getInt("id")).append("\n");
                 sb.append("Title: ").append(rs.getString("title")).append("\n");
                 sb.append("Author: ").append(rs.getString("author")).append("\n");
                 sb.append("Status: ")
-                  .append(rs.getBoolean("available") ? "Available" : "Issued")
-                  .append("\n------------------\n");
+                  .append(rs.getBoolean("available") ? "Available" : "Issued");
             }
 
         } catch (Exception e) {
