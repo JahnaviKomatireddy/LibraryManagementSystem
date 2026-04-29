@@ -69,11 +69,24 @@ public class LibraryService {
             if (rs.next()) {
                 int quantity = rs.getInt("quantity");
                 if (quantity > 0) {
-                String update = "UPDATE books SET quantity = quantity - 1, issue_date=CURDATE(), due_date=DATE_ADD(CURDATE(), INTERVAL 7 DAY) WHERE id=?";
+                String student = javax.swing.JOptionPane.showInputDialog("Enter Student Name:");
+                if (student == null || student.trim().isEmpty()) {
+                    return "Student name required!";
+                }
+
+                String update = "UPDATE books SET quantity = quantity - 1, issue_date=CURDATE(), "
+                        + "due_date=DATE_ADD(CURDATE(), INTERVAL 7 DAY) WHERE id=?";
                 PreparedStatement ps = con.prepareStatement(update);
                 ps.setInt(1, id);
                 ps.executeUpdate();
-                return "Book issued and Due in 7 days.";
+                String insert = "INSERT INTO issued_books (book_id, student_name, "
+                        + "issue_date, due_date) VALUES (?, ?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 7 DAY))";
+                PreparedStatement ps3 = con.prepareStatement(insert);
+                ps3.setInt(1, id);
+                ps3.setString(2, student);
+                ps3.executeUpdate();
+
+                return "Book issued to " + student;
             } else {
                 return "Book not available!";
             }}
@@ -84,7 +97,7 @@ public class LibraryService {
     }
     public String returnBook(int id) {
         try (Connection con = DatabaseConnector.getConnection()) {
-            String query = "SELECT due_date FROM books WHERE id=?";
+            String query = "SELECT due_date FROM issued_books WHERE id=? AND return_date IS NULL";
             PreparedStatement ps = con.prepareStatement(query);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
@@ -96,12 +109,17 @@ public class LibraryService {
                 int fine = 0;
                 if (daysLate > 0) {
                     fine = (int) daysLate * 50;
-                    return "Late by " + daysLate + " days. Fine: ₹" + fine;
                 } 
-                String update = "UPDATE books SET quantity = quantity + 1 WHERE id=?";
-                PreparedStatement ps2 = con.prepareStatement(update);
+                String updateIssue = "UPDATE issued_books SET return_date = CURDATE() "
+                        + "WHERE book_id=? AND return_date IS NULL";
+                 PreparedStatement ps2 = con.prepareStatement(updateIssue);
                 ps2.setInt(1, id);
                 ps2.executeUpdate();
+                
+                String update = "UPDATE books SET quantity = quantity + 1 WHERE id=?";
+                PreparedStatement ps3 = con.prepareStatement(update);
+                ps3.setInt(1, id);
+                ps3.executeUpdate();
                 if (daysLate > 0) {
                 return "Late by " + daysLate + " days. Fine: ₹" + fine;
             } else {
