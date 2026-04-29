@@ -7,6 +7,7 @@ import java.awt.*;
 public class LibraryGUI {
     static UserService userservice = new UserService();
     static LibraryService libraryservice = new LibraryService();
+    
     public static void main(String[] args) {  
         JFrame loginpage = new JFrame("Library Login");
         loginpage.setSize(400, 300);
@@ -24,11 +25,16 @@ public class LibraryGUI {
 
         JButton loginBtn = new JButton("Login");
         loginBtn.setBounds(140, 160, 100, 30);
+        
+        JButton registerBtn = new JButton("Register");
+        registerBtn.setBounds(140, 200, 100, 30);
+
         loginpage.add(userLabel);
         loginpage.add(username);
         loginpage.add(passLabel);
         loginpage.add(password);
         loginpage.add(loginBtn);
+        loginpage.add(registerBtn);
         loginBtn.addActionListener(e -> {
             String user = username.getText();
             String pass = new String(password.getPassword());
@@ -40,8 +46,21 @@ public class LibraryGUI {
                 JOptionPane.showMessageDialog(loginpage, "Invalid Login");
             }
         });
-        loginpage.setVisible(true);
+                registerBtn.addActionListener(e -> {
+            String user = JOptionPane.showInputDialog("Enter Username:");
+            String pass = JOptionPane.showInputDialog("Enter Password:");
+            if (user == null || user.trim().isEmpty() ||pass == null || pass.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(null, "Fields cannot be empty!");
+        return;
     }
+
+    String msg = userservice.register(user, pass);
+    JOptionPane.showMessageDialog(null, msg);
+});
+                loginpage.setVisible(true);
+
+    }
+    
     public static void showDashboard() {
         JFrame frame = new JFrame(" Library Dashboard");
         frame.setSize(550, 450);
